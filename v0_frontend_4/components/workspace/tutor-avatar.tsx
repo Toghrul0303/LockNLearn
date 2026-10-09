@@ -1,7 +1,12 @@
-export function TutorAvatar() {
+import { cn } from "@/lib/utils"
+
+export function TutorAvatar({ className }: { className?: string }) {
   return (
-    <span className="grid size-8 place-items-center rounded-full bg-[#fff0f8] text-xs font-semibold text-[#b52c89]">
-      AI
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/AI%20Avatar.png"
+      alt=""
+      className={cn("shrink-0 rounded-lg object-contain", className)}
+    />
   )
 }

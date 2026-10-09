@@ -1,9 +1,15 @@
+import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/components/workspace/language-context'
 import { AuthProvider } from '@/components/workspace/auth-context'
+import { MemoryBoxProvider } from '@/components/workspace/memory-box-context'
+import { MemoryBoxToast } from '@/components/workspace/memory-box-toast'
 
+// Swapped from Inter — Geist Sans reads noticeably heavier/more legible at
+// body-copy sizes on the Desk/chat pane while keeping the same clean,
+// modern geometric feel.
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -40,8 +46,14 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         <LanguageProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <MemoryBoxProvider>
+              {children}
+              <MemoryBoxToast />
+            </MemoryBoxProvider>
+          </AuthProvider>
         </LanguageProvider>
+        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
