@@ -88,7 +88,7 @@ const en = {
     saveGraph: "Save to GraphBox",
     saved: "Saved",
     backendError:
-      "Sorry — I couldn't reach the tutor backend. Please confirm the server is running at http://127.0.0.1:8000 and try again.",
+      "Sorry — I couldn't reach the tutor backend. Please try again.",
     addTrackerPrompt: "Add questions to Task Tracker?",
     addTracker: "Add questions to Task Tracker",
     summarize: "Summarize?",
@@ -314,7 +314,7 @@ const az: Messages = {
     saveGraph: "GraphBox-a saxla",
     saved: "Saxlanıldı",
     backendError:
-      "Bağışlayın — repetitor serverinə qoşula bilmədim. Serverin http://127.0.0.1:8000 ünvanında işlədiyini yoxlayın və yenidən cəhd edin.",
+      "Bağışlayın — repetitor serverinə qoşula bilmədim. Yenidən cəhd edin.",
     addTrackerPrompt: "Sualları Tapşırıq izləyiciyə əlavə edək?",
     addTracker: "Sualları Tapşırıq izləyiciyə əlavə et",
     summarize: "Xülasə?",
@@ -538,7 +538,7 @@ const tr: Messages = {
     saveGraph: "GraphBox'a kaydet",
     saved: "Kaydedildi",
     backendError:
-      "Üzgünüm — öğretmen sunucusuna ulaşılamadı. Sunucunun http://127.0.0.1:8000 adresinde çalıştığını kontrol edip tekrar deneyin.",
+      "Üzgünüm — öğretmen sunucusuna ulaşılamadı. Tekrar deneyin.",
     addTrackerPrompt: "Sorular Görev izleyiciye eklensin mi?",
     addTracker: "Soruları Görev izleyiciye ekle",
     summarize: "Özetle?",
@@ -762,7 +762,7 @@ const ru: Messages = {
     saveGraph: "Сохранить в GraphBox",
     saved: "Сохранено",
     backendError:
-      "Не удалось связаться с сервером репетитора. Убедитесь, что он запущен на http://127.0.0.1:8000, и попробуйте снова.",
+      "Не удалось связаться с сервером репетитора. Попробуйте снова.",
     addTrackerPrompt: "Добавить вопросы в трекер задач?",
     addTracker: "Добавить вопросы в трекер задач",
     summarize: "Кратко?",
