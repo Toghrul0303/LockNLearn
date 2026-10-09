@@ -36,24 +36,11 @@ from tools import (
     set_pipeline_status,
     _resolve_thread_key,
 )
-class _BlankVision:
-    stem = ""
-    diagrams = []
-    questions = []
-
-
-async def vision_extract_image_file(file_path: str, marker: str = ""):
-    return _BlankVision()
-
-
-def crop_image_diagrams_to_data_urls(*_args, **_kwargs):
-    return []
-
-
-async def vision_inventory_image_file(file_path: str, marker: str = ""):
-    return _BlankVision()
-
-
+from vision_extract import (
+    crop_image_diagrams_to_data_urls,
+    vision_extract_image_file,
+    vision_inventory_image_file,
+)
 from locknlearn_schemas import RoutePlan, SocraticGoalPlan
 from agents import (
     router_llm,
@@ -61,6 +48,7 @@ from agents import (
     socratic_planner_llm,
     SOCRATIC_PLANNER_SYSTEM_PROMPT,
     chat_worker_llm,
+    chat_worker_vision_llm,
     CHAT_WORKER_SYSTEM_PROMPT,
     doc_worker_llm,
     DOC_WORKER_SYSTEM_PROMPT,
@@ -575,7 +563,7 @@ async def _ocr_fallback_image_stem(file_path: str) -> str:
     sys_msg = HumanMessage(content=f"[SYSTEM INSTRUCTION]:\n{_IMAGE_EXTRACTION_SYSTEM_PROMPT}")
     try:
         response = await _ainvoke_llm(
-            chat_worker_llm, [sys_msg, inlined], "Image Extraction"
+            chat_worker_vision_llm, [sys_msg, inlined], "Image Extraction"
         )
     except Exception:
         return ""
@@ -3621,6 +3609,9 @@ async def chat_worker_node(
 
     llm = chat_worker_llm
     label = "Chat Worker"
+    if trimmed_history and _message_has_inline_image(trimmed_history[-1]):
+        llm = chat_worker_vision_llm
+        label = "Chat Worker (vision)"
 
     try:
         response = await _ainvoke_llm(llm, messages_to_pass, label)

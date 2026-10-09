@@ -816,6 +816,13 @@ chat_worker_llm = _deepseek_then_gemini(
     _deepseek_model(temperature=0.4, timeout=DEEPSEEK_WORKER_TIMEOUT_SECONDS),
     _chat_model(_chat_gemini_key, temperature=0.4, timeout=GEMINI_FALLBACK_TIMEOUT_SECONDS),
 )
+# DeepSeek is text-only — never send image_url payloads here. Gemini-only
+# (secondary=None) so a vision 503 does not waste a DeepSeek call that
+# would HTTP 400.
+chat_worker_vision_llm = _gemini_then_deepseek(
+    _chat_model(_chat_gemini_key, temperature=0.4, timeout=GEMINI_VISION_TIMEOUT_SECONDS),
+    None,
+)
 
 CHAT_WORKER_SYSTEM_PROMPT = f"""You are LockNLearn's Chat Worker — a friendly, knowledgeable study companion handling greetings, chitchat, sign-offs, trivial general-knowledge questions, and quick visual analysis of attached images (whiteboard photos, handwritten notes, diagrams). You have no tools and no routing decisions to make (that has already been decided for you). Follow the active study mode for how complete or withheld your answer should be.
 

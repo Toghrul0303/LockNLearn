@@ -2001,6 +2001,22 @@ async def read_page_range(start_page: int, end_page: int, config: RunnableConfig
     if not file_path:
         return f"Səhifə {printed_start}-{printed_end} aralığında mətn tapılmadı."
 
+    span = absolute_end - absolute_start + 1
+    if span <= SHORT_DOC_MAX_PAGES:
+        from vision_extract import vision_extract_pages, crop_diagrams_to_data_urls
+        pages = list(range(absolute_start, absolute_end + 1))
+        extract = await vision_extract_pages(file_path, pages, marker="worksheet")
+        payload = extract.model_dump()
+        payload["abs_page"] = absolute_start
+        payload["file_path"] = file_path
+        if extract.diagrams:
+            payload["image_urls"] = crop_diagrams_to_data_urls(
+                file_path, absolute_start, extract.diagrams, page_count=total_pages,
+            )
+        _vision_extracts[thread_key] = payload
+        if extract.stem.strip():
+            return f"[Səhifə {printed_start}-{printed_end}]:\n{extract.stem.strip()}"
+
     ocr_pages = await _ocr_page_range(thread_key, file_path, absolute_start, absolute_end)
     selected_text = "\n\n".join(ocr_pages).strip()
     if not selected_text:
@@ -2116,11 +2132,22 @@ async def _ocr_page_range(
     abs_start: int,
     abs_end: int,
 ) -> list[str]:
+    from vision_extract import FAST_OCR_MAX_PAGES, ocr_pdf_page
+
     cache = _ocr_page_cache.setdefault(thread_key, {})
-    end = min(abs_end, abs_start + 36 - 1)
+    end = min(abs_end, abs_start + FAST_OCR_MAX_PAGES - 1)
     pages: list[str] = []
     for abs_page in range(abs_start, end + 1):
-        pages.append(cache.get(abs_page, ""))
+        if abs_page in cache:
+            pages.append(cache[abs_page])
+            continue
+        try:
+            text = await ocr_pdf_page(file_path, abs_page)
+        except Exception as e:
+            print(f"[VISION] OCR page {abs_page} failed: {e}", flush=True)
+            text = ""
+        cache[abs_page] = text
+        pages.append(text)
     return pages
 
 
@@ -2136,7 +2163,9 @@ async def _collect_span_pages(
     use_ocr: bool,
 ) -> list[str]:
     """Full resolved span (capped at FAST_OCR_MAX_PAGES). No per-page early return."""
-    end = min(abs_end, abs_start + 36 - 1)
+    from vision_extract import FAST_OCR_MAX_PAGES
+
+    end = min(abs_end, abs_start + FAST_OCR_MAX_PAGES - 1)
     if use_ocr or not page_texts:
         return await _ocr_page_range(thread_key, file_path, abs_start, end)
     selected = page_texts[abs_start - 1:end]
@@ -2205,6 +2234,20 @@ async def _phase2_vision_and_figures(
     """N/N+1 (N-1) vision extract. Crops go to `_vision_extracts.image_urls`
     so composer can emit `canvas_op: figure`. Stem is the tool return."""
     set_pipeline_status(thread_key, PIPELINE_STATUS_VISION)
+    from vision_extract import vision_extract_question, crop_diagrams_to_data_urls
+
+    extract = await vision_extract_question(file_path, found_abs, total_pages, number)
+    payload = extract.model_dump()
+    payload["abs_page"] = found_abs
+    payload["file_path"] = file_path
+    if extract.diagrams:
+        payload["image_urls"] = crop_diagrams_to_data_urls(
+            file_path, found_abs, extract.diagrams, page_count=total_pages,
+        )
+    _vision_extracts[thread_key] = payload
+    if extract.found and extract.stem.strip():
+        return f"[Tapıldı - Səhifə {found_page}]:\n{extract.stem.strip()}"
+    print("[VISION] Gemini stem empty — returning locator snippet", flush=True)
     if snippet:
         return f"[Tapıldı - Səhifə {found_page}]:\n{snippet}"
     return (
@@ -2305,7 +2348,23 @@ async def locate_marker_in_range(
             flush=True,
         )
     elif tagged.strip():
-        hit = None
+        from vision_extract import llm_locate_page
+        locate = await llm_locate_page(
+            tagged, number, kind_arg, abs_start, span_end,
+        )
+        if locate.found:
+            idx = locate.abs_page - abs_start
+            page_text = selected_pages[idx] if 0 <= idx < len(selected_pages) else ""
+            clipped = _find_marker_in_page_texts(
+                [page_text], locate.abs_page, number, True, kind_arg,
+            )
+            snippet = clipped[1] if clipped else page_text
+            hit = (locate.abs_page, snippet)
+            print(
+                f"[VISION] Flash locate hit marker={number} kind={kind_arg} "
+                f"abs_page={locate.abs_page}",
+                flush=True,
+            )
 
     if hit is None:
         return (
