@@ -273,6 +273,14 @@ export function WhiteboardProvider({ children }: { children: ReactNode }) {
     let cancelled = false
     const activeThread = threadId
 
+    if (storesThreadRef.current === activeThread && storesRef.current.size > 0) {
+      attachListenersRef.current(storesRef.current)
+      setReady(true)
+      return () => {
+        cancelled = true
+      }
+    }
+
     async function hydrate() {
       setReady(false)
       clearBoardTimers()

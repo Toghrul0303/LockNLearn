@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react"
 import dynamic from "next/dynamic"
+import type { TLStore } from "tldraw"
 import { FileText, Layers, Pencil, Plus, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useDesk } from "./desk-context"
@@ -16,10 +17,15 @@ const DeskEditor = dynamic(
 
 export function Desk() {
   const { setEditor } = useDesk()
-  const { boards, activeBoardId, activeStore, ready, selectBoard, addBoard, closeBoard, renameBoard } =
+  const { boards, activeBoardId, activeStore, selectBoard, addBoard, closeBoard, renameBoard } =
     useWhiteboard()
   const canvasRef = useRef<HTMLDivElement>(null)
+  const mountedBoard = useRef<{ store: TLStore; boardId: string } | null>(null)
   const { t } = useLanguage()
+  if (activeStore && activeBoardId) {
+    mountedBoard.current = { store: activeStore, boardId: activeBoardId }
+  }
+  const shown = activeStore && activeBoardId ? { store: activeStore, boardId: activeBoardId } : mountedBoard.current
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draftName, setDraftName] = useState("")
   const skipCommit = useRef(false)
@@ -150,8 +156,8 @@ export function Desk() {
       </div>
 
       <div ref={canvasRef} className="relative min-h-0 flex-1 overflow-hidden bg-background">
-        {ready && activeStore ? (
-          <DeskEditor store={activeStore} boardId={activeBoardId} onEditor={setEditor} />
+        {shown ? (
+          <DeskEditor store={shown.store} boardId={shown.boardId} onEditor={setEditor} />
         ) : null}
 
         <BottomDock constraintsRef={canvasRef} />

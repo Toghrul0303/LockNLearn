@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useRef } from "react"
+import dynamic from "next/dynamic"
 import {
   DefaultContextMenu,
   DefaultToolbar,
@@ -8,7 +9,6 @@ import {
   HandToolbarItem,
   SelectToolbarItem,
   TextToolbarItem,
-  Tldraw,
   TldrawUiToolbarButton,
   useEditor,
   useValue,
@@ -20,12 +20,14 @@ import {
   type TLUiOverrides,
 } from "tldraw"
 import { Calculator, CircleHelp } from "lucide-react"
-import "tldraw/tldraw.css"
 import { DESK_CAMERA_EVENT } from "@/lib/desk-events"
 import { useMode } from "../mode-context"
 import { useLanguage } from "../language-context"
 import { useExplainMode } from "../explain-mode-context"
-import { deskShapeUtils } from "./desk-shape-utils"
+
+const DeskTldraw = dynamic(() => import("./desk-tldraw").then((mod) => mod.DeskTldraw), {
+  ssr: false,
+})
 import { findCalculatorShape, toggleCalculatorShape } from "./desk-calculator-shape"
 import { DESK_CARD_TYPE } from "./desk-card-shape"
 import {
@@ -173,34 +175,32 @@ export function DeskEditor({
   onEditor: (editor: Editor | null) => void
 }) {
   const { dark } = useMode()
+  const onEditorRef = useRef(onEditor)
+  onEditorRef.current = onEditor
 
-  const handleMount = useCallback(
-    (editor: Editor) => {
-      onEditor(editor)
-      const unsub = editor.store.listen(
-        () => {
-          window.dispatchEvent(new Event(DESK_CAMERA_EVENT))
-        },
-        { source: "user", scope: "session" },
-      )
-      return () => {
-        unsub()
-        onEditor(null)
-      }
-    },
-    [onEditor],
-  )
+  const handleMount = useCallback((editor: Editor) => {
+    onEditorRef.current(editor)
+    const unsub = editor.store.listen(
+      () => {
+        window.dispatchEvent(new Event(DESK_CAMERA_EVENT))
+      },
+      { source: "user", scope: "session" },
+    )
+    return () => {
+      unsub()
+      onEditorRef.current(null)
+    }
+  }, [])
 
   useEffect(() => {
-    return () => onEditor(null)
-  }, [boardId, onEditor])
+    return () => onEditorRef.current(null)
+  }, [boardId])
 
   return (
     <div className="desk-tldraw absolute inset-0">
-      <Tldraw
+      <DeskTldraw
         key={boardId}
         store={store}
-        shapeUtils={deskShapeUtils}
         components={deskTldrawComponents}
         overrides={deskUiOverrides}
         onMount={handleMount}
