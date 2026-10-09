@@ -1,7 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
-import dynamic from "next/dynamic"
+import { memo, useCallback, useRef } from "react"
 import {
   DefaultContextMenu,
   DefaultToolbar,
@@ -24,10 +23,7 @@ import { DESK_CAMERA_EVENT } from "@/lib/desk-events"
 import { useMode } from "../mode-context"
 import { useLanguage } from "../language-context"
 import { useExplainMode } from "../explain-mode-context"
-
-const DeskTldraw = dynamic(() => import("./desk-tldraw").then((mod) => mod.DeskTldraw), {
-  ssr: false,
-})
+import { DeskTldraw } from "./desk-tldraw"
 import { findCalculatorShape, toggleCalculatorShape } from "./desk-calculator-shape"
 import { DESK_CARD_TYPE } from "./desk-card-shape"
 import {
@@ -165,7 +161,7 @@ const deskUiOverrides: TLUiOverrides = {
   },
 }
 
-export function DeskEditor({
+export const DeskEditor = memo(function DeskEditor({
   store,
   boardId,
   onEditor,
@@ -188,19 +184,23 @@ export function DeskEditor({
     )
     return () => {
       unsub()
-      onEditorRef.current(null)
     }
   }, [])
 
-  useEffect(() => {
-    return () => onEditorRef.current(null)
-  }, [boardId])
+  const frozenId = useRef<string | null>(null)
+  const frozenStore = useRef<TLStore | null>(null)
+  if (!frozenStore.current || (boardId !== frozenId.current && boardId)) {
+    frozenId.current = boardId
+    frozenStore.current = store
+  }
+
+  const stableStore = frozenStore.current ?? store
 
   return (
     <div className="desk-tldraw absolute inset-0">
       <DeskTldraw
-        key={boardId}
-        store={store}
+        key="locknlearn-desk"
+        store={stableStore}
         components={deskTldrawComponents}
         overrides={deskUiOverrides}
         onMount={handleMount}
@@ -208,4 +208,4 @@ export function DeskEditor({
       />
     </div>
   )
-}
+})

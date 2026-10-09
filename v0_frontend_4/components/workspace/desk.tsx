@@ -22,10 +22,10 @@ export function Desk() {
   const canvasRef = useRef<HTMLDivElement>(null)
   const mountedBoard = useRef<{ store: TLStore; boardId: string } | null>(null)
   const { t } = useLanguage()
-  if (activeStore && activeBoardId) {
+  if (activeStore && activeBoardId && mountedBoard.current?.boardId !== activeBoardId) {
     mountedBoard.current = { store: activeStore, boardId: activeBoardId }
   }
-  const shown = activeStore && activeBoardId ? { store: activeStore, boardId: activeBoardId } : mountedBoard.current
+  const shown = mountedBoard.current
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draftName, setDraftName] = useState("")
   const skipCommit = useRef(false)

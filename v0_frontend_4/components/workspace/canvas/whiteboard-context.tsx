@@ -89,6 +89,8 @@ export function WhiteboardProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
   const [storeEpoch, setStoreEpoch] = useState(0)
   const storesRef = useRef(new Map<string, TLStore>())
+  const boardsRef = useRef<WhiteboardMeta[]>([])
+  boardsRef.current = boards
   const storesThreadRef = useRef(threadId)
   const persistTimers = useRef(new Map<string, number>())
   const cloudTimers = useRef(new Map<string, number>())
@@ -282,17 +284,22 @@ export function WhiteboardProvider({ children }: { children: ReactNode }) {
     }
 
     async function hydrate() {
-      setReady(false)
+      const keepMounted = storesRef.current.size > 0
+      if (!keepMounted) setReady(false)
       clearBoardTimers()
       for (const stop of unlistenRef.current) stop()
       unlistenRef.current = []
 
       const rec = getSessionRef.current(activeThread)
       const fallbackName = tRef.current("desk.boardName", { n: 1 })
+      const sameThreadBoards =
+        storesThreadRef.current === activeThread ? boardsRef.current : []
       const metas: WhiteboardMeta[] =
         rec?.whiteboards && rec.whiteboards.length > 0
           ? rec.whiteboards
-          : [defaultBoard(fallbackName)]
+          : sameThreadBoards.length > 0
+            ? sameThreadBoards
+            : [defaultBoard(fallbackName)]
       const active =
         rec?.activeWhiteboardId && metas.some((board) => board.id === rec.activeWhiteboardId)
           ? rec.activeWhiteboardId
@@ -323,7 +330,8 @@ export function WhiteboardProvider({ children }: { children: ReactNode }) {
         })
         if (cancelled) return
         const snap = (resolved.snapshot ?? null) as TLEditorSnapshot | null
-        next.set(board.id, makeStore(snap))
+        const live = storesRef.current.get(board.id)
+        next.set(board.id, live ?? makeStore(snap))
         if (resolved.dirty) nextDirty.add(board.id)
         if (!snap && board.id === active && rec?.deskItems && rec.deskItems.length > 0) {
           migratingItems = rec.deskItems
@@ -331,13 +339,15 @@ export function WhiteboardProvider({ children }: { children: ReactNode }) {
       }
 
       if (cancelled) return
+      const previousActive = storesRef.current.get(active)
+      const nextActive = next.get(active)
       dirtyRef.current = nextDirty
       storesThreadRef.current = activeThread
       storesRef.current = next
       attachListenersRef.current(next)
       setBoards(metas)
       setActiveBoardId(active)
-      setStoreEpoch((n) => n + 1)
+      if (!previousActive || previousActive !== nextActive) setStoreEpoch((n) => n + 1)
       if (migratingItems) replaceDeskItemsRef.current(migratingItems)
       else resetCanvasQueueRef.current()
       setReady(true)
