@@ -20,13 +20,11 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pymupdf as fitz  # `import fitz` still works but is deprecated upstream
-from fastembed import TextEmbedding
 
 from tavily import TavilyClient
 from langchain_core.tools import tool
 from langchain_core.runnables import RunnableConfig
 from langchain_core.embeddings import Embeddings
-from docling.document_converter import DocumentConverter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
@@ -69,6 +67,8 @@ class _FastEmbedEmbeddings(Embeddings):
     deprecation warning on every single embed call."""
 
     def __init__(self, model_name: str = _FASTEMBED_MODEL_NAME):
+        from fastembed import TextEmbedding
+
         self._model = TextEmbedding(model_name=model_name)
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
@@ -78,13 +78,34 @@ class _FastEmbedEmbeddings(Embeddings):
         return next(iter(self._model.query_embed(text))).tolist()
 
 
-# Constructed once, at import time, not lazily per-request: this is where
-# the ONNX model is loaded into memory (and, on this machine's very first
-# run, downloaded — a few hundred MB, cached under `~/.cache/fastembed`
-# afterward). Paying that cost once at process startup — rather than on the
-# first user request — is a deliberate trade-off in exchange for every
-# document-processing call afterward being instant, local, and free.
-embeddings = _FastEmbedEmbeddings()
+class _LazyFastEmbedEmbeddings(Embeddings):
+    """Loads the ONNX model on the first embed call, not at import.
+
+    `TextEmbedding` downloads and maps a few hundred MB. Doing that during
+    process startup, after Docling has already imported torch, exceeds the
+    Railway instance memory limit. The kernel kills the process with no
+    Python traceback — the last log line is the Hugging Face download.
+    """
+
+    def __init__(self) -> None:
+        self._inner: Optional[_FastEmbedEmbeddings] = None
+        self._lock = threading.Lock()
+
+    def _loaded(self) -> _FastEmbedEmbeddings:
+        if self._inner is None:
+            with self._lock:
+                if self._inner is None:
+                    self._inner = _FastEmbedEmbeddings()
+        return self._inner
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return self._loaded().embed_documents(texts)
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._loaded().embed_query(text)
+
+
+embeddings = _LazyFastEmbedEmbeddings()
 
 _thread_auth: dict[str, tuple[str, str]] = {}
 
@@ -981,7 +1002,20 @@ CORRUPTED_DOCUMENT_MESSAGE = (
 
 # Office files only (docx/pptx). PDFs never go through Docling — digital
 # text uses PyMuPDF; scans are indexed as TOC + path and extracted lazily.
-converter = DocumentConverter()
+# Constructed on first use so importing this module does not load torch.
+_converter = None
+_converter_lock = threading.Lock()
+
+
+def _get_converter():
+    global _converter
+    if _converter is None:
+        with _converter_lock:
+            if _converter is None:
+                from docling.document_converter import DocumentConverter
+
+                _converter = DocumentConverter()
+    return _converter
 
 # ---------------------------------------------------------------------------
 # Scientific-notation extraction repair. Many textbook PDFs (this app's
@@ -1092,7 +1126,7 @@ def _extract_pages_pypdf(file_path: str) -> list[str]:
     return pages
 
 
-async def _run_docling_conversion(active_converter: DocumentConverter, file_path: str) -> str:
+async def _run_docling_conversion(active_converter, file_path: str) -> str:
     """Runs a Docling conversion off the event loop, hard-capped by
     `DOCLING_TIMEOUT_SECONDS` (raises `asyncio.TimeoutError` past that) so a
     pathological OCR run can never hang the graph run forever."""
@@ -1155,7 +1189,7 @@ async def _load_document_text(file_path: str) -> tuple[str, Optional[list[str]]]
         return "", None
 
     print("[DOC LOADER] stage=docling_office START", flush=True)
-    converted_text = await _run_docling_conversion(converter, file_path)
+    converted_text = await _run_docling_conversion(_get_converter(), file_path)
     print("[DOC LOADER] stage=docling_office END", flush=True)
     return _normalize_math_notation(converted_text), None
 
