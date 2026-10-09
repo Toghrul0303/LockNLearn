@@ -1,0 +1,526 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --color-brand-red: var(--brand-red);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand: var(--brand);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.977 0.006 320);
+  --foreground: oklch(0.26 0.03 320);
+  --card: oklch(0.995 0.004 320);
+  --card-foreground: oklch(0.26 0.03 320);
+  --popover: oklch(0.995 0.004 320);
+  --popover-foreground: oklch(0.26 0.03 320);
+  --primary: oklch(0.53 0.19 350);
+  --primary-foreground: oklch(0.99 0.005 320);
+  --secondary: oklch(0.94 0.02 320);
+  --secondary-foreground: oklch(0.35 0.06 340);
+  --muted: oklch(0.95 0.012 320);
+  --muted-foreground: oklch(0.52 0.04 330);
+  --accent: oklch(0.93 0.035 320);
+  --accent-foreground: oklch(0.36 0.09 340);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.015 320);
+  --input: oklch(0.9 0.015 320);
+  --ring: oklch(0.53 0.19 350);
+  --chart-1: oklch(0.55 0.2 15);
+  --chart-2: oklch(0.5 0.2 350);
+  --chart-3: oklch(0.5 0.2 300);
+  --chart-4: oklch(0.62 0.16 30);
+  --chart-5: oklch(0.45 0.18 320);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.955 0.012 322);
+  --sidebar-foreground: oklch(0.3 0.04 330);
+  --sidebar-primary: oklch(0.53 0.19 350);
+  --sidebar-primary-foreground: oklch(0.99 0.005 320);
+  --sidebar-accent: oklch(0.92 0.03 322);
+  --sidebar-accent-foreground: oklch(0.36 0.09 340);
+  --sidebar-border: oklch(0.89 0.018 322);
+  --sidebar-ring: oklch(0.53 0.19 350);
+  --brand-red: oklch(0.56 0.2 18);
+  --brand-purple: oklch(0.5 0.2 305);
+  --brand: oklch(0.53 0.2 340);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.17 0.02 320);
+  --foreground: oklch(0.9 0.015 320);
+  --card: oklch(0.21 0.025 320);
+  --card-foreground: oklch(0.9 0.015 320);
+  --popover: oklch(0.21 0.025 320);
+  --popover-foreground: oklch(0.9 0.015 320);
+  --primary: oklch(0.52 0.11 345);
+  --primary-foreground: oklch(0.96 0.01 320);
+  --secondary: oklch(0.26 0.025 320);
+  --secondary-foreground: oklch(0.85 0.02 320);
+  --muted: oklch(0.25 0.02 320);
+  --muted-foreground: oklch(0.62 0.03 325);
+  --accent: oklch(0.3 0.04 330);
+  --accent-foreground: oklch(0.86 0.03 325);
+  --destructive: oklch(0.6 0.14 22);
+  --border: oklch(0.85 0.04 320 / 12%);
+  --input: oklch(0.85 0.04 320 / 15%);
+  --ring: oklch(0.5 0.1 345);
+  --chart-1: oklch(0.5 0.11 15);
+  --chart-2: oklch(0.48 0.11 350);
+  --chart-3: oklch(0.46 0.1 300);
+  --chart-4: oklch(0.55 0.09 30);
+  --chart-5: oklch(0.44 0.1 320);
+  --sidebar: oklch(0.19 0.022 320);
+  --sidebar-foreground: oklch(0.85 0.02 320);
+  --sidebar-primary: oklch(0.52 0.11 345);
+  --sidebar-primary-foreground: oklch(0.96 0.01 320);
+  --sidebar-accent: oklch(0.28 0.035 328);
+  --sidebar-accent-foreground: oklch(0.86 0.03 325);
+  --sidebar-border: oklch(0.85 0.04 320 / 10%);
+  --sidebar-ring: oklch(0.5 0.1 345);
+  --brand-red: oklch(0.5 0.11 18);
+  --brand-purple: oklch(0.46 0.11 305);
+  --brand: oklch(0.49 0.11 340);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.87 0 0);
+    --chart-2: oklch(0.556 0 0);
+    --chart-3: oklch(0.439 0 0);
+    --chart-4: oklch(0.371 0 0);
+    --chart-5: oklch(0.269 0 0);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Geist Sans at the browser-default 400 weight still reads slightly
+       thin for extended reading in the Chat pane/Desk — this bump keeps it
+       legible without looking artificially bold. */
+    font-weight: 450;
+  }
+}
+
+@layer utilities {
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      var(--brand-red) 0%,
+      var(--brand) 50%,
+      var(--brand-purple) 100%
+    );
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      var(--brand-red) 0%,
+      var(--brand-purple) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .ring-brand-glow {
+    box-shadow: 0 10px 40px -12px color-mix(in oklab, var(--brand) 55%, transparent);
+  }
+  /* Gradient-stroke hover glow for quick-action icons (see quick-actions.tsx).
+     `stroke: url(#id)` targets the shared <linearGradient> def so the SVG
+     glyph itself becomes the brand gradient instead of a `bg-clip-text`
+     trick, which only clips real text glyphs and would leave an <svg> icon
+     fully transparent/invisible. */
+  .quick-action-icon {
+    stroke: currentColor;
+    transition: stroke 0.3s ease, filter 0.3s ease;
+  }
+  .group:hover .quick-action-icon {
+    stroke: url(#quick-action-gradient);
+    filter: drop-shadow(0 2px 5px color-mix(in oklab, var(--brand) 50%, transparent));
+  }
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--muted-foreground) 40%, transparent) transparent;
+  }
+  .scroll-slim::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--muted-foreground) 35%, transparent);
+    border-radius: 9999px;
+  }
+}
+
+/* MathJax SVG — Tailwind preflight sets svg { display: block }, which
+   would drop inline formulas onto their own line and off the text baseline. */
+mjx-container {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  max-width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+mjx-container:not([display="true"]) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+mjx-container[display="true"] {
+  display: block;
+  margin: 0.75em 0;
+  text-align: left;
+}
+mjx-container svg {
+  display: inline;
+  vertical-align: middle;
+}
+.math-inline mjx-container {
+  display: inline-block;
+  vertical-align: middle;
+}
+.dark mjx-container,
+.dark .katex {
+  color: #fff;
+}
+.dark mjx-container svg {
+  fill: currentColor;
+}
+
+/* ---------------------------------------------------------------------
+   Vertical spacing around rendered equations — handled via margin/padding
+   on wrapper blocks. `.math-inline` renders as an inline span
+   (see dynamic-desk-widget.tsx's `RichText`) so `display: inline-block`
+   is required for its padding to take visual effect. */
+.desk-artifact p,
+.math-block {
+  margin: 0.5em 0;
+}
+.math-inline {
+  display: inline-block;
+  padding: 0.15em 0;
+}
+
+.board-step-math {
+  min-width: 0;
+}
+.board-step-math p {
+  margin: 0 0 0.75rem;
+}
+.board-step-math p:first-child {
+  margin-top: 0;
+}
+.board-step-math ul,
+.board-step-math ol {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+.board-step-math li {
+  margin-bottom: 0.35rem;
+}
+.board-step-math li:last-child {
+  margin-bottom: 0;
+}
+.board-step-math p:has(> mjx-container:only-child) {
+  text-align: center;
+  padding-right: 1.5rem;
+}
+.board-step-math p:has(> mjx-container:only-child) > mjx-container {
+  font-size: 1.15em;
+  color: #0f172a;
+}
+.board-node mjx-container[display="true"] {
+  display: block !important;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.35rem auto;
+  padding-right: 1.5rem;
+  text-align: center;
+  font-size: 1.15em;
+  color: #0f172a;
+}
+.board-step-math p:has(> mjx-container[display="true"]:only-child) > mjx-container {
+  padding-right: 0;
+}
+
+.board-branch-shell {
+  box-sizing: border-box;
+  border: none;
+  background: transparent;
+}
+
+.desk-artifact,
+.desk-artifact *,
+.board-node,
+.board-node *,
+[data-ai-message],
+[data-ai-message] *,
+mjx-container,
+mjx-container svg,
+mjx-container svg *,
+mjx-container path {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Soft highlight only while the Explain chip is open. */
+html.explain-armed .desk-artifact ::selection,
+html.explain-armed .desk-artifact mjx-container::selection,
+html.explain-armed .desk-artifact mjx-container *::selection,
+html.explain-armed .desk-artifact mjx-container svg::selection,
+html.explain-armed .desk-artifact mjx-container svg *::selection,
+html.explain-armed .board-node ::selection,
+html.explain-armed .board-node mjx-container::selection,
+html.explain-armed .board-node mjx-container *::selection,
+html.explain-armed .board-node mjx-container svg::selection,
+html.explain-armed .board-node mjx-container svg *::selection {
+  background-color: rgba(236, 72, 153, 0.20) !important; /* Soft brand color */
+  color: inherit !important;
+}
+
+html.explain-armed .desk-artifact ::-moz-selection,
+html.explain-armed .desk-artifact mjx-container::-moz-selection,
+html.explain-armed .desk-artifact mjx-container *::-moz-selection,
+html.explain-armed .desk-artifact mjx-container svg::-moz-selection,
+html.explain-armed .desk-artifact mjx-container svg *::-moz-selection {
+  background-color: rgba(236, 72, 153, 0.20) !important;
+  color: inherit !important;
+}
+
+html.explain-armed .desk-artifact mjx-container[data-math-selected],
+html.explain-armed [data-ai-message] mjx-container[data-math-selected],
+html.explain-armed .board-node mjx-container[data-math-selected] {
+  background-color: rgba(236, 72, 153, 0.20);
+  border-radius: 0.25em;
+}
+
+/* Hide the tldraw development watermark */
+.desk-tldraw .tl-watermark,
+.desk-tldraw .tl-watermark_container,
+.desk-tldraw .tl-watermark_SEE-LICENSE,
+.desk-tldraw [class*="watermark"],
+.desk-tldraw [class*="Watermark"],
+.desk-tldraw [data-testid^="tl-watermark"],
+.desk-tldraw a[href*="tldraw.dev"],
+.desk-tldraw a[href*="tldraw.com"],
+.question-preview .tl-watermark,
+.question-preview .tl-watermark_container,
+.question-preview .tl-watermark_SEE-LICENSE,
+.question-preview [class*="watermark"],
+.question-preview [class*="Watermark"],
+.question-preview [data-testid^="tl-watermark"],
+.question-preview a[href*="tldraw.dev"],
+.question-preview a[href*="tldraw.com"] {
+  display: none !important;
+}
+
+/* Vertical floating palette on the left (Figma / Miro style) */
+.desk-tldraw .tlui-layout__bottom,
+.desk-tldraw .tl-toolbar {
+  position: absolute !important;
+  grid-row: 1 / -1 !important;
+  grid-column: 1 !important;
+  left: 12px !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  transform: translateY(-50%) !important;
+  justify-content: flex-start;
+  pointer-events: none;
+}
+.desk-tldraw .tlui-layout__bottom > *,
+.desk-tldraw .tl-toolbar > * {
+  pointer-events: auto;
+}
+.desk-tldraw .tlui-layout__bottom__main {
+  width: auto;
+  align-items: center;
+  justify-content: flex-start;
+}
+.desk-tldraw .tlui-main-toolbar--vertical {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  height: auto !important;
+  padding-left: 0 !important;
+}
+.desk-tldraw .tlui-main-toolbar,
+.desk-tldraw .tlui-main-toolbar__inner,
+.desk-tldraw .tlui-main-toolbar__tools,
+.desk-tldraw .tlui-toolbar {
+  flex-direction: column !important;
+}
+.desk-tldraw .tlui-main-toolbar__inner {
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-popover, white) 92%, transparent);
+  box-shadow: 0 8px 28px rgba(15, 10, 20, 0.12);
+  padding: 4px;
+}
+.desk-tldraw .tl-theme__light,
+.desk-tldraw .tl-container {
+  background: transparent !important;
+}
+.desk-tldraw .desk-artifact,
+.desk-tldraw .desk-artifact *,
+.desk-tldraw .desk-artifact mjx-container,
+.desk-tldraw .desk-artifact mjx-container svg,
+.desk-tldraw .desk-artifact mjx-container svg *,
+.desk-tldraw .board-node,
+.desk-tldraw .board-node *,
+.desk-tldraw .board-node mjx-container,
+.desk-tldraw .board-node mjx-container svg,
+.desk-tldraw .board-node mjx-container svg * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+.desk-card-shape,
+.desk-calculator-shape,
+.desk-calculator-shape * {
+  /* tldraw's own base styles set `pointer-events: none` on `.tl-shape` /
+     `.tl-html-container` with higher cascade precedence than a plain rule
+     here, so this needs `!important` to actually win (same reason
+     `.board-node [data-highlight-source]` below needs it). */
+  pointer-events: all !important;
+}
+.board-node {
+  pointer-events: none;
+}
+.board-node [data-highlight-source],
+.board-node .board-action {
+  pointer-events: all !important;
+}
+
+.board-node {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+.board-node.board-result {
+  font-weight: 600;
+  background: transparent !important;
+}
+.board-action {
+  position: relative;
+  z-index: 5;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  color: color-mix(in oklab, var(--muted-foreground) 88%, transparent);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  /* Generous padding + min-height keep the tap target comfortably
+     clickable even though the label text itself is small. */
+  padding: 6px 12px;
+  min-height: 28px;
+  touch-action: manipulation;
+}
+.board-action:hover:not(:disabled) {
+  color: var(--foreground);
+  background: color-mix(in oklab, var(--foreground) 6%, transparent);
+}
+.board-action:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+html.explain-armed [data-ai-message] ::selection,
+html.explain-armed [data-ai-message] *::selection,
+html.explain-armed [data-ai-message] mjx-container::selection,
+html.explain-armed [data-ai-message] mjx-container *::selection,
+html.explain-armed [data-ai-message] mjx-container svg::selection,
+html.explain-armed [data-ai-message] mjx-container svg *::selection {
+  background-color: rgba(236, 72, 153, 0.20) !important;
+  color: inherit !important;
+}
+
+/* ---------------------------------------------------------------------
+   Desk/Artifact component (dynamic-desk-widget.tsx) — typography.
+   --------------------------------------------------------------------- */
+.desk-artifact {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
