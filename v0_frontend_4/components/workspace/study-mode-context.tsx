@@ -19,7 +19,7 @@ export function StudyModeProvider({ children }: { children: ReactNode }) {
   const setStudyMode = useCallback((mode: ToolMode | string) => {
     const next =
       typeof mode === "string" ? TOOL_MODES.find((item) => item.id === mode) : mode
-    if (next) setStudyModeState(next)
+    if (next && next.id !== "socratic") setStudyModeState(next)
   }, [])
 
   const value = useMemo(() => ({ studyMode, setStudyMode }), [studyMode, setStudyMode])

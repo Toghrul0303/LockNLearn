@@ -1116,7 +1116,8 @@ export function ChatPane({
       offerEvaluation: options?.offerEvaluation,
     }
 
-    const effectiveMode = options?.modeOverride ?? studyMode.id
+    const requestedMode = options?.modeOverride ?? studyMode.id
+    const effectiveMode = requestedMode === "socratic" ? "detailed" : requestedMode
     const isSocraticTurn = !options?.forceNewQuestion && effectiveMode === "socratic"
     let turnAnchorId = options?.canvasAnchorId
     if (!silent && !turnAnchorId && isSocraticTurn) {

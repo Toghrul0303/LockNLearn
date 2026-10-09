@@ -17,14 +17,17 @@ export function ModeToggle({ disabled }: { disabled?: boolean }) {
     >
       {TOOL_MODES.map((mode) => {
         const selected = studyMode.id === mode.id
+        const frozen = mode.id === "socratic"
         return (
           <button
             key={mode.id}
             type="button"
             aria-pressed={selected}
-            title={t(`modes.${mode.id}.description`)}
-            disabled={disabled}
-            onClick={() => setStudyMode(mode.id)}
+            title={frozen ? "Coming Soon" : t(`modes.${mode.id}.description`)}
+            disabled={disabled || frozen}
+            onClick={() => {
+              if (!frozen) setStudyMode(mode.id)
+            }}
             className={cn(
               "rounded-full px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
               selected ? "bg-brand-gradient text-white" : "text-muted-foreground hover:text-foreground",

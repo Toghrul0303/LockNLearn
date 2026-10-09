@@ -724,6 +724,9 @@ def _merge_desk_payload(payloads: list, payload: dict) -> list:
 
 
 def _is_socratic_mode(state: Optional[dict] = None, raw_text: str = "") -> bool:
+    # Hackathon freeze: Socratic stays in the file, but no turn can enter it.
+    # Restore the detector below to reconnect the workflow.
+    return False
     mode = ((state or {}).get("study_mode") or "").strip().lower()
     if mode == "socratic":
         return True

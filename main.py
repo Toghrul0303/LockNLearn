@@ -480,6 +480,9 @@ async def chat_stream_endpoint(
         requested_mode = (mode or DEFAULT_STUDY_MODE).strip().lower()
         if requested_mode not in {"detailed", "socratic"}:
             requested_mode = DEFAULT_STUDY_MODE
+        if requested_mode == "socratic":
+            print("[FREEZE] socratic request forced onto detailed", flush=True)
+            requested_mode = DEFAULT_STUDY_MODE
         source = (explain_source or "").strip().lower()
         if source in ("chat", "desk") or (canvas_branch_from_id or "").strip():
             requested_mode = DEFAULT_STUDY_MODE
