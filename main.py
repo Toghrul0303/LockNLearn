@@ -66,18 +66,49 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="API", version="v2.0.0", lifespan=lifespan)
 
-# Allows the Next.js frontend (v0_frontend_4, served from localhost:3000 in
-# dev) to call this API and read the streamed SSE response cross-origin.
+_DEV_ORIGINS = (
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+)
+_VERCEL_ORIGIN = "https://v0frontend4.vercel.app"
+
+
+def _normalize_origin(origin: str) -> str:
+    """Drop brackets, quotes, and a trailing slash so the browser Origin matches."""
+    return origin.strip().strip("[]\"'").rstrip("/")
+
+
+def _allowed_origins() -> list[str]:
+    """Local Next.js, the Vercel app, and comma-separated CORS_ORIGINS."""
+    configured = [
+        _normalize_origin(origin)
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+    ]
+    origins: list[str] = []
+    for origin in (*_DEV_ORIGINS, _VERCEL_ORIGIN, *configured):
+        if origin and origin not in origins:
+            origins.append(origin)
+    return origins
+
+
+# Allows the Next.js frontend to call this API and read the streamed SSE
+# response cross-origin. Localhost stays allowed for dev; set CORS_ORIGINS
+# to the Vercel origin in production.
+_cors_origins = _allowed_origins()
+print(f"[CORS] allow_origins={_cors_origins}", flush=True)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/health")
+async def health():
+    return {"ok": True}
+
 
 DEFAULT_STUDY_MODE = "detailed"
 STUDY_MODE_INSTRUCTIONS = {
